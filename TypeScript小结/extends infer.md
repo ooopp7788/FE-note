@@ -1,0 +1,73 @@
+### extends Infer
+
+#### conditional type
+TS 中的条件类型:
+
+```
+T extends U ? X : Y
+
+// T：判断类型
+
+// U：条件类型
+
+// X：trueType
+
+// Y：falseType
+
+```
+
+>Extends 关键字表示 T 是否能够 assignable 给 U
+
+
+
+#### distributive conditional types
+
+> conditional type中
+1. T 为 nakedType：nakedType指没有包裹在复合类型中
+2. T 实例化为 unionType，eg：string | number | boolean（any 和 boolean也是unionType）
+3. conditional type 会转化为 distributive conditional types
+
+表现为例子中的，checkedType 是一个 unionType，按照 unionType 中的类型分别判断 extendsType ，得到结果可能是一个unionType：X | Y
+```
+
+type F<T> = T extends U ? X : Y
+
+type union_type = A | B | C
+
+type a = F<union_type>
+
+// 那么a的结果为 A extends U ? X :Y | B extends U ? X :Y | C extends U ? X : Y
+
+
+```
+
+
+#### infer 使用示例
+```
+
+type Tuple<T, U> = [T, U]
+
+type Length<T extends any[]> = T['length']
+
+type Head<T extends any[]> = T[0]
+
+// type Tail<T> = T extends (head: any, ...tail: infer P) ? P : never // TS不支持
+type Tail<A extends any[]> = ((...args: A) => any) extends ((h: any, ...t: infer T) => any) ? T : never
+
+// type Last<T> = T[Length<T> -1]
+type Last<T extends any[]> = T[Length<Tail<T>>]
+
+// 测试
+type head = Head<[number, string, boolean]> // number
+type tail = Tail<[number, string, boolean]> // [string, boolean]
+type last = Last<[number, string, boolean]> // boolean
+```
+
+#### 参考资料
+参考资料：
+
+[TypeScript官方文档](https://www.tslang.cn/docs/handbook/basic-types.html)
+
+[深入理解TypeScript](https://jkchao.github.io/typescript-book-chinese/)
+
+[TypeScript技巧](https://zhuanlan.zhihu.com/c_206498766)
