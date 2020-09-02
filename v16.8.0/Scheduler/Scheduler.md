@@ -27,3 +27,11 @@
 - while 循环判断依次执行 taskQueue
     - 从当前 taskQueue 取出下一个要执行的 currentTask, 仅执行超时的任务, 且要求当前帧有剩余时间
     - currentTask = peek(taskQueue), 进入下个循环判断
+- 如果 currentTask===null 任务执行完毕, 会调用 requestHostTimeout 从 timerQueue 中取出最近的 task, 设置 timer, timer 到期后继续执行任务
+
+### 其他 api 介绍
+
+### 总结
+- Scheduler 提供 unstable_scheduleCallback 用于添加任务, 根据不同任务类型, 存储 task 至 taskQueue or timerQueue
+- taskQueue 执行时, 会判断 task 是否过期 && 当前帧是否有剩余时间, 会在帧剩余时间还有的情况下, 尽可能多的执行已过期的 task
+- timerQueue 表示 delay task 队列, taskQueue 执行完毕时, 设置 timer 保障 timerQeue 按时执行
